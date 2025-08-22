@@ -9,4 +9,12 @@ public interface FileService {
     String uploadFile(MultipartFile file, String filename, String username) throws IOException;
 
     AtsFile getFile(String id);
+
+    String getExtractedData(String id);
+
+    String getScore(String id);
+
+    String getAnalyzedData(String id);
+
+    String retrain();
 }

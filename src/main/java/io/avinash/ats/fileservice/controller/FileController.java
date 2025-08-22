@@ -1,5 +1,6 @@
 package io.avinash.ats.fileservice.controller;
 
+import io.avinash.ats.fileservice.model.ResumeData;
 import io.avinash.ats.fileservice.model.entity.AtsFile;
 import io.avinash.ats.fileservice.service.FileService;
 import org.springframework.http.HttpHeaders;
@@ -41,5 +42,25 @@ public class FileController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFileName() + "\"")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(file.getContent().getData());
+    }
+
+    @GetMapping("/extract/{id}")
+    public String extract(@PathVariable String id) {
+        return fileService.getExtractedData(id);
+    }
+
+    @GetMapping("/score/{id}")
+    public String getScore(@PathVariable String id) {
+        return fileService.getScore(id);
+    }
+
+    @GetMapping("/analyze/{id}")
+    public String getAnalyzedData(@PathVariable String id) {
+        return fileService.getAnalyzedData(id);
+    }
+
+    @GetMapping("/retrain")
+    public String retrain() {
+        return fileService.retrain();
     }
 }

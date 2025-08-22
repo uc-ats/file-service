@@ -18,4 +18,8 @@ public class AtsFile {
     private String fileName;
     private Binary content;
     private LocalDateTime createdDateTime;
+    private String jsonData;
+    private String extractedData;
+    private String scoreData;
+    private String analyzedData;
 }
