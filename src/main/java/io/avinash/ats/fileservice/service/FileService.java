@@ -1,5 +1,7 @@
 package io.avinash.ats.fileservice.service;
 
+import io.avinash.ats.fileservice.model.ResumeData;
+import io.avinash.ats.fileservice.model.ScoreResponse;
 import io.avinash.ats.fileservice.model.entity.AtsFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,9 +12,9 @@ public interface FileService {
 
     AtsFile getFile(String id);
 
-    String getExtractedData(String id);
+    ResumeData getExtractedData(String id);
 
-    String getScore(String id);
+    ScoreResponse getScore(String id);
 
     String getAnalyzedData(String id);
 

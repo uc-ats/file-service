@@ -1,6 +1,8 @@
 package io.avinash.ats.fileservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.avinash.ats.fileservice.constants.FileExtension;
 import io.avinash.ats.fileservice.model.ResumeData;
@@ -47,6 +49,16 @@ public class FileParsingService {
         return json;
     }
 
+    public ResumeData toResumeData(String json){
+        ResumeData data = null;
+        try {
+            data = mapper.readValue(json, new TypeReference<ResumeData>() {});
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        return data;
+    }
+
     public String cleanText(String text) {
         if (text == null) return "";
         return text.replaceAll("\\p{Cntrl}", " ") // remove control chars
@@ -56,7 +68,6 @@ public class FileParsingService {
 
     public String parse(String filename, byte[] content){
         String ext = detectExtension(content);
-        System.out.println(ext);
         FileExtension fileExt = FileExtension.from(ext);
         String rawText = fileExt.getParser().parse(content);
 
@@ -71,9 +82,21 @@ public class FileParsingService {
 
         ResumeData.Sections sections = new ResumeData.Sections();
         sections.setEducation(null);
-        sections.setExperience(Collections.emptyList());
-        sections.setSkills(Collections.emptyList());
         resume.setSections(sections);
+
+        ResumeData.Entities entities = new ResumeData.Entities();
+        entities.setCertifications(Collections.emptyList());
+        entities.setDates(Collections.emptyList());
+        entities.setEmails(Collections.emptyList());
+        entities.setNames(Collections.emptyList());
+        entities.setPhones(Collections.emptyList());
+        entities.setOrganizations(Collections.emptyList());
+        entities.setLocations(Collections.emptyList());
+        entities.setSkillPhrases(Collections.emptyList());
+        entities.setTitles(Collections.emptyList());
+        resume.setEntities(entities);
+
+        resume.setNormalizedSkills(Collections.emptyList());
 
         return toJson(resume);
     }

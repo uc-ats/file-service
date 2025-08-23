@@ -1,6 +1,7 @@
 package io.avinash.ats.fileservice.controller;
 
 import io.avinash.ats.fileservice.model.ResumeData;
+import io.avinash.ats.fileservice.model.ScoreResponse;
 import io.avinash.ats.fileservice.model.entity.AtsFile;
 import io.avinash.ats.fileservice.service.FileService;
 import org.springframework.http.HttpHeaders;
@@ -45,12 +46,12 @@ public class FileController {
     }
 
     @GetMapping("/extract/{id}")
-    public String extract(@PathVariable String id) {
+    public ResumeData extract(@PathVariable String id) {
         return fileService.getExtractedData(id);
     }
 
     @GetMapping("/score/{id}")
-    public String getScore(@PathVariable String id) {
+    public ScoreResponse getScore(@PathVariable String id) {
         return fileService.getScore(id);
     }
 

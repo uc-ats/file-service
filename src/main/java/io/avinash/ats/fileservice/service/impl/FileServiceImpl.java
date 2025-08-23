@@ -1,7 +1,11 @@
 package io.avinash.ats.fileservice.service.impl;
 
 import io.avinash.ats.fileservice.client.AtsNlpClient;
+import io.avinash.ats.fileservice.exception.IdNotFoundException;
 import io.avinash.ats.fileservice.model.NLPRequest;
+import io.avinash.ats.fileservice.model.ResumeData;
+import io.avinash.ats.fileservice.model.ScoreRequest;
+import io.avinash.ats.fileservice.model.ScoreResponse;
 import io.avinash.ats.fileservice.model.entity.AtsFile;
 import io.avinash.ats.fileservice.repository.FileRepository;
 import io.avinash.ats.fileservice.service.FileParsingService;
@@ -46,39 +50,43 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public String getExtractedData(String id){
-        AtsFile atsFile = fileRepository.findById(id).orElse(null);
-        NLPRequest request = new NLPRequest();
-        request.setFileName(atsFile.getFileName());
-        request.setText(atsFile.getJsonData());
-        log.info("request : {}",fileParsingService.toJson(request));
-        String data = fileParsingService.toJson(atsNlpClient.extract(request));
-        atsFile.setExtractedData(data);
-        log.info("response : {}",data);
-        return data;
+    public ResumeData getExtractedData(String id){
+        AtsFile atsFile = fileRepository.findById(id).orElseThrow(()->new IdNotFoundException());
+        ResumeData request = fileParsingService.toResumeData(atsFile.getJsonData());
+        log.info("request : {}",atsFile.getJsonData());
+        ResumeData response = atsNlpClient.extract(request);
+        String responseJson = fileParsingService.toJson(response);
+        log.info("response : {}",responseJson);
+        atsFile.setExtractedData(responseJson);
+        fileRepository.save(atsFile);
+        return response;
     }
 
     @Override
-    public String getScore(String id){
-        AtsFile atsFile = fileRepository.findById(id).orElse(null);
-        String request = atsFile.getExtractedData();
+    public ScoreResponse getScore(String id){
+        AtsFile atsFile = fileRepository.findById(id).orElseThrow(()->new IdNotFoundException());
+        ResumeData extractedData = fileParsingService.toResumeData(atsFile.getExtractedData());
+        ScoreRequest request = new ScoreRequest();
+        request.setJobDescription("");
+        request.setResume(extractedData);
         log.info("request : {}",request);
-        String data = fileParsingService.toJson(atsNlpClient.getScore(request));
-        atsFile.setExtractedData(data);
+        ScoreResponse scoreResponse = atsNlpClient.getScore(request);
+        String data = fileParsingService.toJson(scoreResponse);
         log.info("response : {}",data);
-        return data;
+        atsFile.setExtractedData(data);
+        fileRepository.save(atsFile);
+        return scoreResponse;
     }
 
     @Override
     public String getAnalyzedData(String id){
         AtsFile atsFile = fileRepository.findById(id).orElse(null);
-        NLPRequest request = new NLPRequest();
-        request.setFileName(atsFile.getFileName());
-        request.setText(atsFile.getJsonData());
-        log.info("request : {}",fileParsingService.toJson(request));
+        ResumeData request = fileParsingService.toResumeData(atsFile.getJsonData());
+        log.info("request : {}", atsFile.getJsonData());
         String data = fileParsingService.toJson(atsNlpClient.analyze(request));
-        atsFile.setExtractedData(data);
         log.info("response : {}",data);
+        atsFile.setAnalyzedData(data);
+        fileRepository.save(atsFile);
         return data;
     }
 
